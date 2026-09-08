@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch } from '../../store/hooks';
 import { addWorkspace, updateWorkspace } from '../../store/slices/workspacesSlice';
 import { Modal } from '../../components/ui/modal';

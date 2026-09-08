@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';

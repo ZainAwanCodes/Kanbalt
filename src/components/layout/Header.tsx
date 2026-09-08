@@ -1,6 +1,7 @@
 import { Menu, Search, Bell } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
+import { openTaskModal } from '../../store/slices/uiSlice';
 
 export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const { items: projects, activeProjectId } = useAppSelector(state => state.projects);
@@ -38,7 +39,10 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
       
       <div className="flex items-center gap-2 md:gap-4">
         {activeProject && (
-          <button className="hidden sm:block px-4 py-1.5 bg-cobalt hover:bg-cobalt-dark text-white rounded-md text-sm font-medium transition-colors">
+          <button 
+            onClick={() => dispatch(openTaskModal({ taskId: null, defaultStatus: 'todo' }))}
+            className="hidden sm:block px-4 py-1.5 bg-cobalt hover:bg-cobalt-dark text-white rounded-md text-sm font-medium transition-colors"
+          >
             New task
           </button>
         )}

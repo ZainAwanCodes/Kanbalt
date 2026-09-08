@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addProject, updateProject, setActiveProject } from '../../store/slices/projectsSlice';
 import { Modal } from '../../components/ui/modal';

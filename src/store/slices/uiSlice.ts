@@ -1,11 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ViewType } from '../../types';
+import { ViewType, TaskStatus } from '../../types';
 
 interface UiState {
   theme: 'light' | 'dark';
   isSidebarOpen: boolean;
   isCommandPaletteOpen: boolean;
   globalView: ViewType;
+  taskModal: {
+    isOpen: boolean;
+    taskId: string | null;
+    defaultStatus: TaskStatus;
+  };
 }
 
 const initialState: UiState = {
@@ -13,6 +18,11 @@ const initialState: UiState = {
   isSidebarOpen: true,
   isCommandPaletteOpen: false,
   globalView: 'kanban',
+  taskModal: {
+    isOpen: false,
+    taskId: null,
+    defaultStatus: 'todo',
+  }
 };
 
 const uiSlice = createSlice({
@@ -30,9 +40,18 @@ const uiSlice = createSlice({
     },
     setGlobalView: (state, action: PayloadAction<ViewType>) => {
       state.globalView = action.payload;
+    },
+    openTaskModal: (state, action: PayloadAction<{ taskId?: string | null; defaultStatus?: TaskStatus }>) => {
+      state.taskModal.isOpen = true;
+      state.taskModal.taskId = action.payload.taskId || null;
+      state.taskModal.defaultStatus = action.payload.defaultStatus || 'todo';
+    },
+    closeTaskModal: (state) => {
+      state.taskModal.isOpen = false;
+      state.taskModal.taskId = null;
     }
   },
 });
 
-export const { toggleTheme, setSidebarOpen, setCommandPaletteOpen, setGlobalView } = uiSlice.actions;
+export const { toggleTheme, setSidebarOpen, setCommandPaletteOpen, setGlobalView, openTaskModal, closeTaskModal } = uiSlice.actions;
 export default uiSlice.reducer;

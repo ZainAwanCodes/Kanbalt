@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import authReducer from './slices/authSlice';
 import workspacesReducer from './slices/workspacesSlice';
 import projectsReducer from './slices/projectsSlice';
@@ -12,7 +12,18 @@ const loadState = () => {
     if (serializedState === null) {
       return undefined;
     }
-    return JSON.parse(serializedState);
+    const state = JSON.parse(serializedState);
+    
+    // Migration/Fix: Ensure ui.taskModal exists if state was saved before it was added
+    if (state && state.ui && !state.ui.taskModal) {
+      state.ui.taskModal = {
+        isOpen: false,
+        taskId: null,
+        defaultStatus: 'todo',
+      };
+    }
+    
+    return state;
   } catch (err) {
     console.error("Could not load state", err);
     return undefined;
@@ -31,15 +42,17 @@ const saveState = (state: any) => {
 
 const preloadedState = loadState();
 
+const rootReducer = combineReducers({
+  auth: authReducer,
+  workspaces: workspacesReducer,
+  projects: projectsReducer,
+  tasks: tasksReducer,
+  ui: uiReducer,
+});
+
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    workspaces: workspacesReducer,
-    projects: projectsReducer,
-    tasks: tasksReducer,
-    ui: uiReducer,
-  },
-  preloadedState,
+  reducer: rootReducer,
+  preloadedState: preloadedState as any,
 });
 
 store.subscribe(() => {
