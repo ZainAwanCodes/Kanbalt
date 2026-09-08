@@ -11,6 +11,12 @@ interface UiState {
     taskId: string | null;
     defaultStatus: TaskStatus;
   };
+  filters: {
+    searchQuery: string;
+    assigneeId: string | null;
+    sortBy: 'date' | 'priority' | 'none';
+    sortOrder: 'asc' | 'desc';
+  };
 }
 
 const initialState: UiState = {
@@ -22,6 +28,12 @@ const initialState: UiState = {
     isOpen: false,
     taskId: null,
     defaultStatus: 'todo',
+  },
+  filters: {
+    searchQuery: '',
+    assigneeId: null,
+    sortBy: 'none',
+    sortOrder: 'desc',
   }
 };
 
@@ -49,9 +61,29 @@ const uiSlice = createSlice({
     closeTaskModal: (state) => {
       state.taskModal.isOpen = false;
       state.taskModal.taskId = null;
+    },
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.filters.searchQuery = action.payload;
+    },
+    setAssigneeFilter: (state, action: PayloadAction<string | null>) => {
+      state.filters.assigneeId = action.payload;
+    },
+    setSortConfig: (state, action: PayloadAction<{ sortBy: 'date' | 'priority' | 'none', sortOrder: 'asc' | 'desc' }>) => {
+      state.filters.sortBy = action.payload.sortBy;
+      state.filters.sortOrder = action.payload.sortOrder;
     }
   },
 });
 
-export const { toggleTheme, setSidebarOpen, setCommandPaletteOpen, setGlobalView, openTaskModal, closeTaskModal } = uiSlice.actions;
+export const { 
+  toggleTheme, 
+  setSidebarOpen, 
+  setCommandPaletteOpen, 
+  setGlobalView, 
+  openTaskModal, 
+  closeTaskModal,
+  setSearchQuery,
+  setAssigneeFilter,
+  setSortConfig
+} = uiSlice.actions;
 export default uiSlice.reducer;

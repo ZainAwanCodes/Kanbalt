@@ -2,9 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { addTask, updateTask, deleteTask } from '../../store/slices/tasksSlice';
 import { closeTaskModal } from '../../store/slices/uiSlice';
+import { logActivity } from '../../store/slices/activitiesSlice';
+import { addToast } from '../../store/slices/toastSlice';
 import { Modal } from '../../components/ui/modal';
 import { v4 as uuidv4 } from 'uuid';
 import { Task, TaskStatus, TaskPriority } from '../../types';
+import { TaskComments } from './TaskComments';
+import { TaskActivity } from './TaskActivity';
 import { 
   AlignLeft, Calendar, CheckSquare, ChevronDown, 
   Circle, Clock, Flag, LayoutList, Square, Trash2, X, AlertCircle, User
@@ -58,9 +62,15 @@ export function TaskModal() {
 
   const handleSave = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!title.trim() || !activeProjectId) return;
+    if (!title.trim() || !activeProjectId || !currentUser) return;
 
     if (taskToEdit) {
+      let changesMade = false;
+      let details = [];
+      if (taskToEdit.status !== status) { changesMade = true; details.push(`status to ${status}`); }
+      if (taskToEdit.priority !== priority) { changesMade = true; details.push(`priority to ${priority}`); }
+      if (taskToEdit.assigneeId !== assigneeId) { changesMade = true; details.push(`assignee`); }
+      
       dispatch(updateTask({
         id: taskToEdit.id,
         changes: {
@@ -73,9 +83,22 @@ export function TaskModal() {
           updatedAt: new Date().toISOString()
         }
       }));
+
+      if (changesMade) {
+        dispatch(logActivity({
+          id: uuidv4(),
+          workspaceId: '',
+          taskId: taskToEdit.id,
+          userId: currentUser.id,
+          action: 'edited',
+          details: `Updated ${details.join(', ')}`,
+          createdAt: new Date().toISOString()
+        }));
+      }
     } else {
+      const newTaskId = uuidv4();
       dispatch(addTask({
-        id: uuidv4(),
+        id: newTaskId,
         projectId: activeProjectId,
         title: title.trim(),
         description: description.trim(),
@@ -87,15 +110,24 @@ export function TaskModal() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }));
+
+      dispatch(logActivity({
+        id: uuidv4(),
+        workspaceId: '',
+        taskId: newTaskId,
+        userId: currentUser.id,
+        action: 'created',
+        details: 'Created task',
+        createdAt: new Date().toISOString()
+      }));
     }
     dispatch(closeTaskModal());
   };
 
   const handleAddSubtask = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newSubtaskTitle.trim() || !activeProjectId) return;
+    if (!newSubtaskTitle.trim() || !activeProjectId || !currentUser) return;
 
-    // If creating a new task, we must save the parent task first to get an ID.
     let parentId = taskModal.taskId;
     
     if (!parentId) {
@@ -113,9 +145,17 @@ export function TaskModal() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       }));
-      // Update UI state to switch from "create" to "edit" mode behind the scenes
-      // Wait, we need to hack around this by just closing and reopening? 
-      // Better: we just save the task and close the modal, requesting them to save first.
+      
+      dispatch(logActivity({
+        id: uuidv4(),
+        workspaceId: '',
+        taskId: parentId,
+        userId: currentUser.id,
+        action: 'created',
+        details: 'Created task via subtask prompt',
+        createdAt: new Date().toISOString()
+      }));
+
       alert("Please save the main task first before adding subtasks.");
       return;
     }
@@ -130,6 +170,16 @@ export function TaskModal() {
       labels: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
+    }));
+
+    dispatch(logActivity({
+      id: uuidv4(),
+      workspaceId: '',
+      taskId: parentId,
+      userId: currentUser.id,
+      action: 'edited',
+      details: 'Added a subtask',
+      createdAt: new Date().toISOString()
     }));
     
     setNewSubtaskTitle('');
@@ -150,7 +200,7 @@ export function TaskModal() {
     >
       <form onSubmit={handleSave} className="flex flex-col md:flex-row h-full min-h-[500px] max-h-[85vh]">
         {/* Main Content Area (Left) */}
-        <div className="flex-1 p-6 md:p-8 overflow-y-auto border-r border-line">
+        <div className="flex-1 p-6 md:p-8 overflow-y-auto border-r border-line no-scrollbar">
           {/* Header Actions */}
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2 text-sm text-ink-soft font-medium">
@@ -162,8 +212,18 @@ export function TaskModal() {
                 <button 
                   type="button"
                   onClick={() => {
-                    dispatch(deleteTask(taskToEdit.id));
-                    dispatch(closeTaskModal());
+                    if (confirm('Delete this task?')) {
+                      dispatch(deleteTask(taskToEdit.id));
+                      dispatch(addToast({
+                        message: 'Task deleted',
+                        type: 'info',
+                        undoAction: {
+                          type: 'tasks/addTask',
+                          payload: taskToEdit
+                        }
+                      }));
+                      dispatch(closeTaskModal());
+                    }
                   }}
                   className="p-1.5 text-ink-soft hover:text-amber hover:bg-amber/10 rounded-md transition-colors"
                   title="Delete task"
@@ -172,12 +232,12 @@ export function TaskModal() {
                 </button>
               )}
               <button 
-                type="button"
-                onClick={() => dispatch(closeTaskModal())}
-                className="p-1.5 text-ink-soft hover:text-ink hover:bg-stone/20 rounded-md transition-colors md:hidden"
-              >
-                <X className="w-5 h-5" />
-              </button>
+                 type="button"
+                 onClick={() => dispatch(closeTaskModal())}
+                 className="p-1.5 text-ink-soft hover:text-ink hover:bg-stone/20 rounded-md transition-colors md:hidden"
+               >
+                 <X className="w-5 h-5" />
+               </button>
             </div>
           </div>
 
@@ -208,7 +268,7 @@ export function TaskModal() {
               />
             </div>
 
-            {/* Subtasks (Only show if editing an existing task, to simplify data flow) */}
+            {/* Subtasks */}
             {taskToEdit ? (
               <div className="space-y-3 pt-4 border-t border-line">
                 <div className="flex items-center gap-2 text-ink font-medium">
@@ -276,7 +336,15 @@ export function TaskModal() {
             ) : (
               <div className="pt-4 border-t border-line flex items-start gap-2 p-3 bg-amber/5 rounded-md text-amber text-sm">
                 <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <p>Save this task first to enable subtasks and checklist tracking.</p>
+                <p>Save this task first to enable subtasks, comments, and activity tracking.</p>
+              </div>
+            )}
+
+            {/* Comments and Activity */}
+            {taskToEdit && (
+              <div className="pt-6 border-t border-line mt-6">
+                 <TaskComments taskId={taskToEdit.id} />
+                 <TaskActivity taskId={taskToEdit.id} />
               </div>
             )}
           </div>

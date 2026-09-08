@@ -4,6 +4,9 @@ import workspacesReducer from './slices/workspacesSlice';
 import projectsReducer from './slices/projectsSlice';
 import tasksReducer from './slices/tasksSlice';
 import uiReducer from './slices/uiSlice';
+import commentsReducer from './slices/commentsSlice';
+import activitiesReducer from './slices/activitiesSlice';
+import toastReducer from './slices/toastSlice';
 
 // Load state from local storage
 const loadState = () => {
@@ -14,13 +17,28 @@ const loadState = () => {
     }
     const state = JSON.parse(serializedState);
     
-    // Migration/Fix: Ensure ui.taskModal exists if state was saved before it was added
-    if (state && state.ui && !state.ui.taskModal) {
-      state.ui.taskModal = {
-        isOpen: false,
-        taskId: null,
-        defaultStatus: 'todo',
-      };
+    // Migration/Fix: Ensure ui.taskModal and ui.filters exist if state was saved before they were added
+    if (state && state.ui) {
+      if (!state.ui.taskModal) {
+        state.ui.taskModal = {
+          isOpen: false,
+          taskId: null,
+          defaultStatus: 'todo',
+        };
+      }
+      if (!state.ui.filters) {
+        state.ui.filters = {
+          searchQuery: '',
+          assigneeId: null,
+          sortBy: 'none',
+          sortOrder: 'desc',
+        };
+      }
+    }
+    
+    // Reset toast state to avoid showing old toasts on reload
+    if (state.toast) {
+      state.toast.items = [];
     }
     
     return state;
@@ -48,6 +66,9 @@ const rootReducer = combineReducers({
   projects: projectsReducer,
   tasks: tasksReducer,
   ui: uiReducer,
+  comments: commentsReducer,
+  activities: activitiesReducer,
+  toast: toastReducer,
 });
 
 export const store = configureStore({

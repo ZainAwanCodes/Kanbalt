@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { CommandPalette } from '../ui/CommandPalette';
 import { addWorkspace } from '../../store/slices/workspacesSlice';
 import { addProject, setActiveProject } from '../../store/slices/projectsSlice';
 import { cn } from '../../lib/utils';
@@ -71,6 +72,8 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           {children}
         </main>
       </div>
+
+      <CommandPalette />
     </div>
   );
 }
