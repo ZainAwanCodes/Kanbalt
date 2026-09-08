@@ -12,7 +12,7 @@ import { KanbanBoard } from './features/tasks/KanbanBoard';
 import { ListView } from './features/tasks/ListView';
 import { CalendarView } from './features/tasks/CalendarView';
 import { ToastContainer } from './components/ui/ToastContainer';
-import { setGlobalView, setAssigneeFilter, setSortConfig } from './store/slices/uiSlice';
+import { setGlobalView, setAssigneeFilter, setSortConfig, openTaskModal } from './store/slices/uiSlice';
 import { cn } from './lib/utils';
 import { Filter, ArrowUpDown } from 'lucide-react';
 

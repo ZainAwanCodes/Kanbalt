@@ -9,7 +9,7 @@ export function ListView({ tasks }: { tasks: Task[] }) {
   const { mockUsers } = useAppSelector(state => state.auth);
 
   return (
-    <div className="h-full overflow-auto rounded-md border border-line bg-paper-2">
+    <div className="h-full overflow-auto rounded-md border border-line bg-paper-2 no-scrollbar">
       <div className="min-w-[800px] flex items-center p-4 border-b border-line text-xs font-semibold text-ink-soft uppercase tracking-wider sticky top-0 bg-paper-2 z-10 shadow-sm">
         <div className="flex-1 pl-2">Task Name</div>
         <div className="w-32">Status</div>

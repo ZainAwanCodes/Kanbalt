@@ -42,7 +42,7 @@ export function KanbanBoard({ projectTasks }: { projectTasks: Task[] }) {
           workspaceId: '',
           taskId: draggableId,
           userId: currentUser.id,
-          action: 'moved',
+          action: 'status_changed',
           details: `status to ${newStatus}`,
           createdAt: new Date().toISOString()
         }));
@@ -62,7 +62,7 @@ export function KanbanBoard({ projectTasks }: { projectTasks: Task[] }) {
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div className="flex gap-6 h-full min-w-max pb-4">
+      <div className="flex gap-6 h-full min-w-max pb-4 px-1">
         {COLUMNS.map(col => (
           <KanbanColumn 
             key={col.id}

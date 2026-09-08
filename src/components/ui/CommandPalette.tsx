@@ -56,16 +56,22 @@ export function CommandPalette() {
     ...(q ? filteredTasks.slice(0, 5).map(t => ({
       ...t,
       type: 'task',
+      title: t.title,
+      icon: undefined,
       action: () => dispatch(openTaskModal({ taskId: t.id }))
     })) : []),
     ...filteredProjects.slice(0, 5).map(p => ({
       ...p,
       type: 'project',
+      title: p.name,
+      icon: undefined,
       action: () => dispatch(setActiveProject(p.id))
     })),
     ...(q ? [] : filteredActions).map(a => ({
       ...a,
-      type: 'action'
+      type: 'action',
+      title: a.title,
+      icon: a.icon
     }))
   ];
 
@@ -148,7 +154,7 @@ export function CommandPalette() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-medium text-sm truncate">
-                        {item.title || item.name}
+                        {item.title}
                       </div>
                       <div className="text-xs text-ink-soft mt-0.5 capitalize">
                         {item.type}

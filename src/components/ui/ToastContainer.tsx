@@ -16,7 +16,7 @@ export function ToastContainer() {
   );
 }
 
-function ToastItem({ toast, dispatch }: { toast: any; dispatch: any }) {
+function ToastItem({ toast, dispatch }: { toast: any; dispatch: any; key?: React.Key }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       dispatch(removeToast(toast.id));
