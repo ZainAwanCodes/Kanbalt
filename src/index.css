@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #F3F4F1;
+  --color-paper-2: #FFFFFF;
+  --color-ink: #14181C;
+  --color-ink-soft: #4B5259;
+  --color-line: #DDDCD4;
+  --color-cobalt: #3452FF;
+  --color-cobalt-dark: #263DBF;
+  --color-stone: #C7C2B8;
+  --color-moss: #4C7A5B;
+  --color-amber: #E8A33D;
+  
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "Inter", sans-serif;
+  
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+}
+
+body {
+  background-color: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  letter-spacing: -0.02em;
+}
+
+/* Utility for optimal line length */
+.max-w-readable {
+  max-width: 75ch;
+}

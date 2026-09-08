@@ -1,0 +1,6 @@
+{
+  "name": "Kanbalt",
+  "description": "A Notion/Jira-style workspace management tool with offline capabilities and simulated real-time collaboration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
