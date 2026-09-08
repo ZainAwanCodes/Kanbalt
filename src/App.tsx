@@ -12,6 +12,7 @@ import { KanbanBoard } from './features/tasks/KanbanBoard';
 import { ListView } from './features/tasks/ListView';
 import { CalendarView } from './features/tasks/CalendarView';
 import { ToastContainer } from './components/ui/ToastContainer';
+import { ProfileModal } from './features/profile/ProfileModal';
 import { setGlobalView, setAssigneeFilter, setSortConfig, openTaskModal } from './store/slices/uiSlice';
 import { cn } from './lib/utils';
 import { Filter, ArrowUpDown } from 'lucide-react';
@@ -261,6 +262,7 @@ export default function App() {
       
       {/* Global Task Modal */}
       <TaskModal />
+      <ProfileModal />
       <ToastContainer />
     </AppLayout>
   );

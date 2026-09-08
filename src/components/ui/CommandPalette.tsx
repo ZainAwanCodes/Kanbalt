@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { setCommandPaletteOpen, openTaskModal, setGlobalView } from '../../store/slices/uiSlice';
+import { setCommandPaletteOpen, openTaskModal, setGlobalView, setProfileModalOpen } from '../../store/slices/uiSlice';
 import { setActiveProject } from '../../store/slices/projectsSlice';
-import { Search, Folder, CheckSquare, Calendar, List, Columns, X } from 'lucide-react';
+import { Search, Folder, CheckSquare, Calendar, List, Columns, X, User } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export function CommandPalette() {
@@ -46,6 +46,7 @@ export function CommandPalette() {
     { id: 'view-kanban', title: 'Go to Kanban View', icon: <Columns className="w-4 h-4 text-cobalt" />, action: () => dispatch(setGlobalView('kanban')) },
     { id: 'view-list', title: 'Go to List View', icon: <List className="w-4 h-4 text-cobalt" />, action: () => dispatch(setGlobalView('list')) },
     { id: 'view-calendar', title: 'Go to Calendar View', icon: <Calendar className="w-4 h-4 text-cobalt" />, action: () => dispatch(setGlobalView('calendar')) },
+    { id: 'profile-settings', title: 'Profile Settings', icon: <User className="w-4 h-4 text-cobalt" />, action: () => dispatch(setProfileModalOpen(true)) },
   ];
 
   const filteredProjects = projects.filter(p => p.name.toLowerCase().includes(q));

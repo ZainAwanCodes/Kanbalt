@@ -28,6 +28,11 @@ const authSlice = createSlice({
     updateProfile: (state, action: PayloadAction<Partial<User>>) => {
       if (state.currentUser) {
         state.currentUser = { ...state.currentUser, ...action.payload };
+        // Also update in mockUsers list so UI reflects globally
+        const index = state.mockUsers.findIndex(u => u.id === state.currentUser!.id);
+        if (index !== -1) {
+          state.mockUsers[index] = { ...state.mockUsers[index], ...action.payload };
+        }
       }
     },
     addMockUser: (state, action: PayloadAction<User>) => {

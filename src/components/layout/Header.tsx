@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, Search, Bell, Activity, Cloud, CloudOff } from 'lucide-react';
+import { Menu, Search, Bell, Activity, Cloud, CloudOff, User, LogOut, Settings } from 'lucide-react';
 import { useAppSelector, useAppDispatch } from '../../store/hooks';
 import { logout } from '../../store/slices/authSlice';
-import { openTaskModal, setSearchQuery, setCommandPaletteOpen } from '../../store/slices/uiSlice';
+import { openTaskModal, setSearchQuery, setCommandPaletteOpen, setProfileModalOpen } from '../../store/slices/uiSlice';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '../../lib/utils';
 
@@ -15,6 +15,7 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const dispatch = useAppDispatch();
   
   const [isActivityOpen, setIsActivityOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
   useEffect(() => {
@@ -36,6 +37,8 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
   const recentActivities = [...activities]
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
     .slice(0, 10);
+
+  const isColorClass = (str: string | undefined) => str?.startsWith('bg-');
 
   return (
     <header className="h-14 border-b border-line bg-paper-2 flex items-center justify-between px-4 md:px-8 shrink-0 relative z-40">
@@ -145,8 +148,11 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
                       const user = mockUsers.find(u => u.id === activity.userId);
                       return (
                         <div key={activity.id} className="p-2 hover:bg-stone/5 rounded-md flex gap-3 text-sm transition-colors">
-                          <div className="w-6 h-6 rounded-full bg-stone/20 flex items-center justify-center text-xs font-medium text-ink shrink-0 mt-0.5">
-                            {user?.avatar || user?.name.charAt(0) || '?'}
+                          <div className={cn(
+                            "w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium shrink-0 mt-0.5",
+                            isColorClass(user?.avatar) ? user?.avatar : "bg-stone/20 text-ink"
+                          )}>
+                            {isColorClass(user?.avatar) ? user?.name.charAt(0).toUpperCase() : (user?.avatar || user?.name.charAt(0) || '?')}
                           </div>
                           <div>
                             <span className="font-semibold text-ink">{user?.name || 'Unknown'}</span>{' '}
@@ -165,15 +171,53 @@ export function Header({ onMenuClick }: { onMenuClick: () => void }) {
           )}
         </div>
         
-        <button 
-          onClick={() => dispatch(logout())}
-          className="text-sm font-medium text-ink-soft hover:text-ink transition-colors px-2 hidden md:block whitespace-nowrap"
-        >
-          Sign out
-        </button>
-        
-        <div className="w-8 h-8 rounded-[8px] bg-stone/30 text-ink flex items-center justify-center font-semibold text-sm shrink-0">
-          {currentUser?.avatar || currentUser?.name.charAt(0)}
+        <div className="relative">
+          <button 
+            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          >
+            <div className={cn(
+              "w-8 h-8 rounded-[8px] flex items-center justify-center font-semibold text-sm shrink-0 border border-line",
+              isColorClass(currentUser?.avatar) ? currentUser?.avatar : "bg-stone/20 text-ink"
+            )}>
+              {isColorClass(currentUser?.avatar) ? currentUser?.name.charAt(0).toUpperCase() : (currentUser?.avatar || currentUser?.name?.charAt(0))}
+            </div>
+          </button>
+
+          {/* User Menu Dropdown */}
+          {isUserMenuOpen && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setIsUserMenuOpen(false)} />
+              <div className="absolute right-0 top-full mt-2 w-56 bg-paper border border-line rounded-lg shadow-xl z-50 py-1 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="px-4 py-3 border-b border-line mb-1">
+                  <p className="text-sm font-semibold text-ink truncate">{currentUser?.name}</p>
+                  <p className="text-xs text-ink-soft truncate">{currentUser?.email}</p>
+                </div>
+                
+                <button 
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    dispatch(setProfileModalOpen(true));
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-stone/10 flex items-center gap-2 transition-colors"
+                >
+                  <User className="w-4 h-4 text-ink-soft" />
+                  Profile settings
+                </button>
+                
+                <button 
+                  onClick={() => {
+                    setIsUserMenuOpen(false);
+                    dispatch(logout());
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign out
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </header>

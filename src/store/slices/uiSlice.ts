@@ -5,6 +5,7 @@ interface UiState {
   theme: 'light' | 'dark';
   isSidebarOpen: boolean;
   isCommandPaletteOpen: boolean;
+  isProfileModalOpen: boolean;
   globalView: ViewType;
   taskModal: {
     isOpen: boolean;
@@ -23,6 +24,7 @@ const initialState: UiState = {
   theme: 'light',
   isSidebarOpen: true,
   isCommandPaletteOpen: false,
+  isProfileModalOpen: false,
   globalView: 'kanban',
   taskModal: {
     isOpen: false,
@@ -49,6 +51,9 @@ const uiSlice = createSlice({
     },
     setCommandPaletteOpen: (state, action: PayloadAction<boolean>) => {
       state.isCommandPaletteOpen = action.payload;
+    },
+    setProfileModalOpen: (state, action: PayloadAction<boolean>) => {
+      state.isProfileModalOpen = action.payload;
     },
     setGlobalView: (state, action: PayloadAction<ViewType>) => {
       state.globalView = action.payload;
@@ -79,6 +84,7 @@ export const {
   toggleTheme, 
   setSidebarOpen, 
   setCommandPaletteOpen, 
+  setProfileModalOpen,
   setGlobalView, 
   openTaskModal, 
   closeTaskModal,
